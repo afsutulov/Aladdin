@@ -38,6 +38,21 @@ The record is retained across levels, continues and new games during the process
 | Esc | Return to the title menu; exit from the title menu |
 | F11 | Full screen |
 
+### Gamepad
+
+Xbox (XInput), PlayStation DualSense/DualShock, Switch Pro and other controllers known to the SDL controller database work on Windows, Linux and macOS, over USB or Bluetooth. They can be connected at any time and work alongside the keyboard.
+
+| Button | Action | Keyboard |
+|---|---|---|
+| D-pad or left stick | Move, navigate menus | Arrows/WASD |
+| A / Cross | Jump | Space/Z |
+| X / Square | Sword | X |
+| B / Circle, Y / Triangle | Throw an apple | C |
+| Menu / Options | Start | Enter |
+| View / Share (Create) | Return to the title menu; exit from the title menu | Esc |
+
+On Linux the controller is read from `/dev/input/event*`; desktop distributions grant this to the logged-in user. If a pad is not detected, check that your user can read those devices.
+
 In Abu rooms, Space/Z jumps and X swipes; C and vertical directions have no action. Tracking settings use the original Default/Classic/Tight camera behavior and persist across level changes and continues. Music and effects have separate playback settings. Re-enabling music in settings restarts the title song. `-mute` disables the audio device entirely.
 
 A normal launch starts like the console at power-on: the Disney Software/Virgin Games co-production intro (Genie flight, title theme from boundary 69, A/B/C/Start skip window 90–369), then the title menu with the intro's original frame counter and random seed.
