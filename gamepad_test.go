@@ -37,3 +37,13 @@ func TestMapPadKeepsKeyboard(t *testing.T) {
 		t.Fatalf("keyboard input lost: %+v", in)
 	}
 }
+
+func TestXInputPad(t *testing.T) {
+	p := xinputPad(xinputGamepad{Buttons: xinputA | xinputX | xinputStart | xinputDpadLeft, ThumbLY: 32767})
+	var in game.Input
+	mapPad(&in, p)
+	want := game.Input{Jump: true, Sword: true, Enter: true, Left: true, Up: true}
+	if in != want {
+		t.Fatalf("got %+v, want %+v", in, want)
+	}
+}

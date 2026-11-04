@@ -55,6 +55,7 @@ func applyGamepads(in *game.Input) {
 	for _, id := range gamepadIDs {
 		mapPad(in, readPad(id))
 	}
+	applyXInput(func(p padState) { mapPad(in, p) })
 }
 
 func readPad(id ebiten.GamepadID) padState {
