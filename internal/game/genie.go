@@ -211,7 +211,7 @@ func (g *Game) drawGenie() {
 			g.Err = err
 			return
 		}
-		draw.Draw(g.Canvas, g.Canvas.Rect, g.paletteImage(im), image.Point{}, draw.Over)
+		drawOver(g.Canvas, g.Canvas.Rect, g.paletteImage(im), image.Point{})
 		g.drawActors(g.Canvas, layer.high)
 	}
 	g.drawHUD(g.Canvas)

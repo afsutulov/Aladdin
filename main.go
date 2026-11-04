@@ -32,6 +32,11 @@ type desktop struct {
 	stopAfter int
 	capture   string
 	ticks     int
+	// fresh is set when a game step ran since the last Draw. The software
+	// renderer is only worth running once per step: on 120/144/165 Hz
+	// monitors Ebitengine calls Draw two or three times per Update, and the
+	// screen keeps its previous contents (SetScreenClearedEveryFrame(false)).
+	fresh bool
 }
 
 func (d *desktop) Update() error {
@@ -55,6 +60,7 @@ func (d *desktop) Update() error {
 	if !d.clock.Advance() {
 		return nil
 	}
+	d.fresh = true
 	if d.game.Update(in) {
 		return ebiten.Termination
 	}
@@ -96,7 +102,13 @@ func (d *desktop) Update() error {
 	}
 	return nil
 }
-func (d *desktop) Draw(screen *ebiten.Image)  { screen.WritePixels(d.game.Render().Pix) }
+func (d *desktop) Draw(screen *ebiten.Image) {
+	if !d.fresh {
+		return
+	}
+	d.fresh = false
+	screen.WritePixels(d.game.Render().Pix)
+}
 func (d *desktop) Layout(_, _ int) (int, int) { return game.Width, game.Height }
 func main() {
 	mute := flag.Bool("mute", false, "disable audio output")
