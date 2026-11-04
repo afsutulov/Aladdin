@@ -19,7 +19,7 @@ type drawTarget interface {
 	Set(int, int, color.Color)
 }
 
-func (s spriteSpan) Set(x, y int, c color.Color) {
+func (s *spriteSpan) Set(x, y int, c color.Color) {
 	if y >= 0 && y < Height && x >= s.Left && x < s.Left+s.Width[y] {
 		s.drawTarget.Set(x, y, c)
 	}
