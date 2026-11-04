@@ -80,16 +80,6 @@ Development launches: `./Aladdin -dev`, `-scenes`, `-stage 1`, `-genie 10`, or `
 
 Verification command: `go vet ./...`. The automated comparison suite and original reference recordings are not part of this release archive. See `CHANGES.ru.md` for the measured differences from the original.
 
-Converted assets are already present. Optional offline rebuilding from the supplied image:
-
-```sh
-go run ./cmd/extract -rom "/path/to/Aladdin (USA) (Final Cut).gen"
-```
-
-Sound data (`gems.bin`) is embedded; the importer rebuilds graphics and game data only.
-
-The importer accepts SHA-256 `e18516722c0ff3466bf6f4d0c1092cc4bdab926c846db37876394ac300849b65` and verifies all 76 RNC1 blocks. It converts data once; it is not used to execute the game.
-
 ## Credits and licensing
 
 Original Aladdin/Final Cut graphics, audio and game data belong to their respective rights holders and are not covered by the new-code license. This project grants no rights to redistribute original assets or trademarks.
