@@ -1,5 +1,7 @@
 package sound
 
+import "aladdin/internal/timing"
+
 // Audio timeline of the native sound system: the GEMS driver port runs at
 // each video boundary, the YM2612 at clock/144 and the PSG at Z80 clock/16,
 // all on the NTSC master clock. Chip writes carry the driver's own time (see
@@ -7,10 +9,10 @@ package sound
 // chips' piecewise-constant outputs over each output period.
 
 const (
-	masterClock = 53693175
-	fmCycles    = 7 * 144    // master cycles per YM2612 sample
-	psgCycles   = 15 * 16    // master cycles per PSG step
-	frameCycles = 262 * 3420 // master cycles per NTSC video boundary
+	masterClock = timing.MasterClock
+	fmCycles    = 7 * 144            // master cycles per YM2612 sample
+	psgCycles   = 15 * 16            // master cycles per PSG step
+	frameCycles = timing.FrameCycles // master cycles per NTSC video boundary
 	never       = int64(1) << 62
 )
 

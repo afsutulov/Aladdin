@@ -4,6 +4,7 @@ import (
 	"aladdin/internal/data"
 	"aladdin/internal/game"
 	"aladdin/internal/sound"
+	"aladdin/internal/timing"
 	"bytes"
 	_ "embed"
 	"flag"
@@ -23,6 +24,7 @@ import (
 var icon []byte
 
 type desktop struct {
+	clock     timing.Clock
 	dev       bool // development hotkeys (F1/F2/F3/R); off for normal play
 	game      *game.Game
 	mixer     *sound.Mixer
@@ -49,6 +51,9 @@ func (d *desktop) Update() error {
 		// The original has no such controls; they would let a player reset a
 		// level by accident, so they exist only in development launches.
 		in.Free, in.Debug, in.Reset, in.View = pressed(ebiten.KeyF2), pressed(ebiten.KeyF1), pressed(ebiten.KeyR), pressed(ebiten.KeyF3)
+	}
+	if !d.clock.Advance() {
+		return nil
 	}
 	if d.game.Update(in) {
 		return ebiten.Termination
@@ -139,6 +144,7 @@ func main() {
 	if im, e := png.Decode(bytes.NewReader(icon)); e == nil {
 		ebiten.SetWindowIcon([]image.Image{im})
 	}
+	ebiten.SetTPS(timing.HostTPS)
 	ebiten.SetWindowTitle("Aladdin")
 	ebiten.SetWindowSize(960, 672)
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)

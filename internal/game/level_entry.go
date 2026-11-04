@@ -37,6 +37,7 @@ var levelEntryProfiles = map[int]entryProfile{
 	0: {jobs: [9]entryJob{{"reset", 1}, {"objects", 9}, {"characters", 57}, {"background", 3}, {"room", 23}, {"rows", 1}, {"preparation", 0}, {"artwork", 6}, {"sprites", 1}}, preparation: [2]int{15, 25}, warmup: [2]int{2, 1}, caption: 0x18, scroll: -1},
 	1: {jobs: [9]entryJob{{"reset", 1}, {"objects", 9}, {"characters", 57}, {"background", 3}, {"room", 23}, {"rows", 1}, {"preparation", 0}, {"artwork", 6}, {"sprites", 1}}, preparation: [2]int{9, 12}, scroll: -1},
 	3: {jobs: [9]entryJob{{"reset", 1}, {"objects", 8}, {"characters", 52}, {"background", 3}, {"room", 17}, {"rows", 0}, {"preparation", 0}, {"artwork", 0}, {"sprites", 1}}, preparation: [2]int{13, 21}, caption: 0x11, scroll: 1},
+	5: {jobs: [9]entryJob{{"reset", 1}, {"objects", 8}, {"characters", 62}, {"background", 5}, {"room", 19}, {"rows", 0}, {"preparation", 0}, {"artwork", 6}, {"sprites", 1}}, preparation: [2]int{12, 19}, caption: 0x19},
 }
 
 func (g *Game) beginLevelEntry(clock *NativeWorld) {
@@ -207,8 +208,10 @@ func (w *NativeWorld) prepareInitialMap(tick int) error {
 			}
 		}
 		w.updateHUDWave()
-		delta := -1
-		if w.Stage.Index == 3 {
+		delta := 0
+		if w.Stage.Index <= 2 {
+			delta = -1
+		} else if w.Stage.Index == 3 {
 			delta = 1
 		}
 		w.set("background_phase", (w.get("background_phase")+delta)&65535)

@@ -38,6 +38,7 @@ func newStorySession(w *NativeWorld, stage int) (*StorySession, error) {
 	v := NewNativeWorld(w.Stage, w.Scripts, w.Frames)
 	v.clearLifeActors()
 	v.Life.Phase = LifeClear
+	v.HUDWaveIndex, v.HUDWaveTile = w.HUDWaveIndex, w.HUDWaveTile
 	v.Seed = w.Seed
 	v.set("tick", w.get("tick"))
 	v.requestMusic(p.Music)

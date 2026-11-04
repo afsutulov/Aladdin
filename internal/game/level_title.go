@@ -31,6 +31,7 @@ func (g *Game) beginLevelTitle(w *NativeWorld) {
 		// A level with no preceding story still owns an independent cinematic
 		// actor list. Clearing its lettering must not clear the gameplay actors.
 		v := NewNativeWorld(w.Stage, w.Scripts, w.Frames)
+		v.HUDWaveIndex, v.HUDWaveTile = w.HUDWaveIndex, w.HUDWaveTile
 		v.Seed = w.Seed
 		v.set("tick", w.get("tick"))
 		w = v

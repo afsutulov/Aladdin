@@ -169,7 +169,7 @@ func (r ROM) ImportScripts() (result data.ScriptSet, err error) {
 		return result, e
 	}
 	result.Messages = map[int]data.Message{}
-	for _, id := range []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 0x0e, 0x10, 0x11, 0x12, 0x15, 0x16, 0x17, 0x18, 0x1a} {
+	for _, id := range []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 0x0e, 0x10, 0x11, 0x12, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a} {
 		entry := 0x14f46a + id*12
 		pc, x, y := r.U32(entry), r.U16(entry+4), r.U16(entry+6)
 		m := data.Message{Callback: callbackName(r.U32(entry + 8))}

@@ -127,7 +127,11 @@ func NewFromPowerOn(p *Project) *Game {
 	return g
 }
 func (g *Game) Stage() *data.Stage { return &g.Project.Manifest.Stages[g.StagePosition] }
-func (g *Game) Start(index int) {
+func (g *Game) Start(index int)    { g.startStage(index, true) }
+
+// startStage can allocate inventory/state without executing gameplay
+// preparation before the original story/header transition.
+func (g *Game) startStage(index int, prepare bool) {
 	g.Ending = nil
 	g.LevelEntry = nil
 	g.LevelTitle = nil
@@ -153,22 +157,22 @@ func (g *Game) Start(index int) {
 	g.World.set("high_score", g.HighScore)
 	g.World.requestMusic(s.Music)
 	g.World.EnableStageActors()
-	if abuStage(s.Index) {
+	if prepare && abuStage(s.Index) {
 		if err := g.World.prepareAbu(); err != nil {
 			g.Err = err
 			return
 		}
 	}
-	if s.Index == 12 {
+	if prepare && s.Index == 12 {
 		g.World.initializeIago()
 	}
-	if s.Index >= 9 && s.Index <= 12 {
+	if prepare && s.Index >= 9 && s.Index <= 12 {
 		if err := g.World.prepareScene(); err != nil {
 			g.Err = err
 			return
 		}
 	}
-	if s.Index == 8 {
+	if prepare && s.Index == 8 {
 		if err := g.World.prepareRugRide(); err != nil {
 			g.Err = err
 			return

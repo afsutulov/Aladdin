@@ -32,7 +32,7 @@ type Mixer struct {
 	synth        *genesisSynth
 	enabled      bool
 	musicEnabled bool
-	music        int
+	music        map[int]bool
 	effects      map[int]bool
 	buf          []float64
 	tail         [4]byte
@@ -58,7 +58,7 @@ func Load(files fs.FS) (*Mixer, error) {
 	if hex.EncodeToString(sum[:]) != gemsDataSHA256 {
 		return nil, fmt.Errorf("sound data checksum mismatch")
 	}
-	return &Mixer{synth: newGenesisSynth(rom), enabled: true, musicEnabled: true, music: -1, effects: map[int]bool{}, tailPosition: 4}, nil
+	return &Mixer{synth: newGenesisSynth(rom), enabled: true, musicEnabled: true, music: map[int]bool{}, effects: map[int]bool{}, tailPosition: 4}, nil
 }
 
 // StopAll is the driver's stop-all request.
@@ -66,7 +66,7 @@ func (m *Mixer) StopAll() {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.synth.request(0x16)
-	m.music = -1
+	m.music = map[int]bool{}
 	m.effects = map[int]bool{}
 }
 
@@ -88,9 +88,11 @@ func (m *Mixer) SetEnabled(enabled bool) {
 func (m *Mixer) SetMusicEnabled(enabled bool) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	if m.musicEnabled && !enabled && m.music >= 0 {
-		m.synth.request(0x12, byte(m.music))
-		m.music = -1
+	if m.musicEnabled && !enabled {
+		for id := range m.music {
+			m.synth.request(0x12, byte(id))
+		}
+		m.music = map[int]bool{}
 	}
 	m.musicEnabled = enabled
 }
@@ -105,9 +107,7 @@ func (m *Mixer) Command(id int, stopOnly bool) error {
 	defer m.mu.Unlock()
 	m.synth.request(0x12, byte(id))
 	delete(m.effects, id)
-	if m.music == id {
-		m.music = -1
-	}
+	delete(m.music, id)
 	if stopOnly {
 		return nil
 	}
@@ -115,10 +115,9 @@ func (m *Mixer) Command(id int, stopOnly bool) error {
 		if !m.musicEnabled {
 			return nil
 		}
-		if m.music >= 0 {
-			m.synth.request(0x12, byte(m.music))
-		}
-		m.music = id
+		// 219F48 stops only this ID. Other sequences retain their channels;
+		// GEMS priorities and explicit sequence commands decide any voice stealing.
+		m.music[id] = true
 	} else {
 		if !m.enabled {
 			return nil

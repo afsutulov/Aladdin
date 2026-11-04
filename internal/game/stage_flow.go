@@ -46,7 +46,7 @@ func (g *Game) advanceStage() {
 		g.beginEnding()
 		return
 	}
-	g.Start(old.Flow.NextStage)
+	g.startStage(old.Flow.NextStage, false)
 	if g.Err != nil {
 		return
 	}
@@ -56,20 +56,20 @@ func (g *Game) advanceStage() {
 	}
 	w.RouteCursor = old.RouteCursor
 	w.Seed = old.Seed
-	// New-level preparation shares the original player initializer with
-	// respawn, but retains inventory and starts without damage protection.
-	apples := w.get("apples_ascii")
-	if abuStage(w.Stage.Index) {
-		w.Life = LifeCycle{Phase: LifeFadeIn, FreshStage: true}
-		g.beginStory()
+	w.HUDWaveIndex, w.HUDWaveTile = old.HUDWaveIndex, old.HUDWaveTile
+	// 1D3052/1DB798 precede stage preparation. Iago is the source's
+	// explicit story/header bypass, so prepare that encounter here once.
+	if w.Stage.Index == 12 {
+		apples := w.get("apples_ascii")
+		if err := w.respawn(); err != nil {
+			g.Err = err
+			return
+		}
+		w.set("apples_ascii", apples)
+		w.set("invulnerability", 0)
+		w.Life.FreshStage = true
 		return
 	}
-	if e := w.respawn(); e != nil {
-		g.Err = e
-		return
-	}
-	w.set("apples_ascii", apples)
-	w.set("invulnerability", 0)
 	g.beginStory()
 }
 

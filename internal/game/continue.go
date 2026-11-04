@@ -129,7 +129,7 @@ func (w *NativeWorld) updateContinue(in Input) error {
 
 func (g *Game) continueStage() {
 	old := g.World
-	g.Start(old.Stage.Index)
+	g.startStage(old.Stage.Index, false)
 	if g.Err != nil {
 		return
 	}
@@ -138,6 +138,7 @@ func (g *Game) continueStage() {
 		w.set(n, old.get(n))
 	}
 	w.Seed = old.Seed
+	w.HUDWaveIndex, w.HUDWaveTile = old.HUDWaveIndex, old.HUDWaveTile
 	w.RouteCursor = old.RouteCursor
 	apples := w.get("apples_ascii")
 	if e := w.respawn(); e != nil {
