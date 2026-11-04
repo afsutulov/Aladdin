@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="night" x2="0" y2="1"><stop stop-color="#36245a"/><stop offset="1" stop-color="#11182d"/></linearGradient>
+    <linearGradient id="gold" x2="0.8" y2="1"><stop stop-color="#ffe89b"/><stop offset="0.55" stop-color="#e6ac45"/><stop offset="1" stop-color="#aa6429"/></linearGradient>
+  </defs>
+  <rect x="6" y="6" width="244" height="244" rx="54" fill="url(#night)"/>
+  <path d="M152 91C130 72 177 60 151 30M140 97C116 82 145 76 134 64" fill="none" stroke="#a8b4ff" stroke-width="8" stroke-linecap="round"/>
+  <path d="M64 137C24 109 29 173 69 169" fill="none" stroke="url(#gold)" stroke-width="13"/>
+  <path d="M61 133C84 126 132 123 171 128L226 106C222 126 201 149 176 153C166 184 89 194 64 169C56 161 54 145 61 133Z" fill="url(#gold)"/>
+  <path d="M90 130Q121 103 153 128" fill="url(#gold)"/>
+  <path d="M120 114L125 103L132 115" fill="#ffe89b"/>
+  <path d="M111 182L104 199H159L149 182" fill="url(#gold)"/>
+  <path d="M81 146Q113 139 160 142" fill="none" stroke="#fff0b8" stroke-width="5" stroke-linecap="round"/>
+  <path d="M204 61L207 70L217 73L207 76L204 86L201 76L192 73L201 70Z" fill="#ffe89b"/>
+</svg>
