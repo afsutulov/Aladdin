@@ -52,6 +52,7 @@ func (d *desktop) Update() error {
 		ebiten.SetFullscreen(!ebiten.IsFullscreen())
 	}
 	in := game.Input{Left: pressed(ebiten.KeyArrowLeft, ebiten.KeyA), Right: pressed(ebiten.KeyArrowRight, ebiten.KeyD), Up: pressed(ebiten.KeyArrowUp, ebiten.KeyW), Down: pressed(ebiten.KeyArrowDown, ebiten.KeyS), Jump: pressed(ebiten.KeySpace, ebiten.KeyZ), Sword: pressed(ebiten.KeyX), Apple: pressed(ebiten.KeyC), Enter: pressed(ebiten.KeyEnter), Escape: pressed(ebiten.KeyEscape), Space: pressed(ebiten.KeySpace)}
+	applyGamepads(&in)
 	if d.dev {
 		// The original has no such controls; they would let a player reset a
 		// level by accident, so they exist only in development launches.
