@@ -128,7 +128,7 @@ func (g *Game) drawGameOver() {
 func (g *Game) drawLifeImage(im image.Image) {
 	p, ok := im.(*image.Paletted)
 	if !ok {
-		draw.Draw(g.Canvas, g.Canvas.Rect, im, image.Point{}, draw.Over)
+		drawOver(g.Canvas, g.Canvas.Rect, im, image.Point{})
 		return
 	}
 	pal := g.renderPalette()

@@ -4,7 +4,6 @@ import (
 	"aladdin/internal/choreography"
 	"fmt"
 	"image"
-	"image/draw"
 )
 
 // initializeRugRide reconstructs the stage-specific setup at 1E0E3A.
@@ -247,7 +246,7 @@ func (g *Game) drawRugScene(dst *image.RGBA) {
 				start -= 512
 			}
 			for ; start < Width; start += 512 {
-				draw.Draw(dst, image.Rect(start, row*8, start+512, row*8+8), im, image.Pt(0, row*8), draw.Over)
+				drawOver(dst, image.Rect(start, row*8, start+512, row*8+8), im, image.Pt(0, row*8))
 			}
 		}
 	}

@@ -111,6 +111,8 @@ type Game struct {
 	Canvas                                            *image.RGBA
 	actorLayer                                        *image.RGBA
 	actorPriority                                     []bool
+	atlasAlpha                                        *[256]bool
+	atlasAlphaOf                                      *image.Paletted
 }
 
 func New(p *Project) *Game {
@@ -414,6 +416,35 @@ func (g *Game) sprite(dst draw.Image, index, x, y, scale int, flip bool, banks .
 	g.blitSprite(dst, f.X, f.Y, f.W, f.H, left, top, scale, flip, flipY, palette, banks...)
 }
 func (g *Game) blitSprite(dst draw.Image, atlasX, atlasY, width, height, left, top, scale int, flip, flipY bool, palette [64][3]uint8, banks ...int) {
+	if atlas, ok := g.Project.Atlas.(*image.Paletted); ok && len(banks) > 0 && image.Rect(atlasX, atlasY, atlasX+width, atlasY+height).In(atlas.Rect) {
+		// Same result as the generic loop below, reading palette indices
+		// directly instead of boxing a colour per atlas pixel.
+		opaque := g.atlasOpacity(atlas)
+		base := (banks[0] & 3) * 16
+		for yy := 0; yy < height; yy++ {
+			row := atlas.Pix[atlas.PixOffset(atlasX, atlasY+yy):][:width]
+			for xx, idx := range row {
+				if !opaque[idx] {
+					continue
+				}
+				rgb := palette[base+int(idx)&15]
+				c := color.RGBA{rgb[0], rgb[1], rgb[2], 255}
+				sx, sy := xx, yy
+				if flip {
+					sx = width - 1 - xx
+				}
+				if flipY {
+					sy = height - 1 - yy
+				}
+				for dy := 0; dy < scale; dy++ {
+					for dx := 0; dx < scale; dx++ {
+						dst.Set(left+sx*scale+dx, top+sy*scale+dy, c)
+					}
+				}
+			}
+		}
+		return
+	}
 	for yy := 0; yy < height; yy++ {
 		for xx := 0; xx < width; xx++ {
 			c := g.Project.Atlas.At(atlasX+xx, atlasY+yy)
@@ -467,7 +498,7 @@ func (g *Game) actorSprite(dst draw.Image, index, x, y, shakeX, shakeY int, flip
 		left, top := x+px-128+shakeX, y+py-128+shakeY
 		target := dst
 		if d, ok := dst.(actorTarget); ok {
-			target = spriteSpan{d, left, d.lines.reserve(left, top, p.W, p.H)}
+			target = &spriteSpan{d, left, d.lines.reserve(left, top, p.W, p.H)}
 		}
 		g.blitSprite(target, p.X, p.Y, p.W, p.H, left, top, 1, flip, flipY, palette, bank)
 	}
@@ -533,7 +564,7 @@ func (g *Game) scene() {
 		x, y := palaceInteriorScroll(g.CameraX, g.CameraY)
 		for left := x - 512; left < Width; left += 512 {
 			for top := -y; top < Height; top += 256 {
-				draw.Draw(dst, image.Rect(left, top, left+512, top+256), bg, image.Point{}, draw.Over)
+				drawOver(dst, image.Rect(left, top, left+512, top+256), bg, image.Point{})
 			}
 		}
 	}
@@ -587,7 +618,7 @@ func (g *Game) scene() {
 			start -= 512
 		}
 		for ; start < Width; start += 512 {
-			draw.Draw(dst, image.Rect(start, row*8, start+512, row*8+8), bg, image.Pt(0, row*8), draw.Over)
+			drawOver(dst, image.Rect(start, row*8, start+512, row*8+8), bg, image.Pt(0, row*8))
 		}
 	}
 	low, _ := g.Project.Image(fmt.Sprintf("stage%02d-low.png", s.Index))
@@ -639,7 +670,7 @@ func (g *Game) drawRoomPlane(dst *image.RGBA, plane image.Image) {
 		x += escapeJitter(g.World.get("tick"))
 	}
 	if g.World == nil || len(g.World.RemovedCells) == 0 {
-		draw.Draw(dst, dst.Rect, plane, image.Pt(x, y), draw.Over)
+		drawOver(dst, dst.Rect, plane, image.Pt(x, y))
 		return
 	}
 	columns := g.World.Stage.Width / 16
@@ -648,7 +679,7 @@ func (g *Game) drawRoomPlane(dst *image.RGBA, plane image.Image) {
 			if g.World.RemovedCells[(top/16)*columns+left/16] {
 				continue
 			}
-			draw.Draw(dst, image.Rect(left-x, top-y, left-x+16, top-y+16), plane, image.Pt(left, top), draw.Over)
+			drawOver(dst, image.Rect(left-x, top-y, left-x+16, top-y+16), plane, image.Pt(left, top))
 		}
 	}
 }
@@ -657,7 +688,7 @@ func (g *Game) drawDungeonPlane(dst *image.RGBA, plane image.Image) {
 	x, y := dungeonScroll(g.CameraX, g.CameraY)
 	for left := x - 512; left < Width; left += 512 {
 		for top := -y; top < Height; top += 256 {
-			draw.Draw(dst, image.Rect(left, top, left+512, top+256), plane, image.Point{}, draw.Over)
+			drawOver(dst, image.Rect(left, top, left+512, top+256), plane, image.Point{})
 		}
 	}
 }

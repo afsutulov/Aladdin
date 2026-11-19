@@ -110,10 +110,18 @@ type actorTarget struct {
 }
 
 func (d actorTarget) Set(x, y int, c color.Color) {
-	if !image.Pt(x, y).In(d.Rect) || d.RGBA.RGBAAt(x, y).A != 0 {
+	if !image.Pt(x, y).In(d.Rect) {
 		return
 	}
-	d.RGBA.Set(x, y, c)
+	i := d.RGBA.PixOffset(x, y)
+	if d.RGBA.Pix[i+3] != 0 {
+		return
+	}
+	if rgba, ok := c.(color.RGBA); ok {
+		d.RGBA.Pix[i], d.RGBA.Pix[i+1], d.RGBA.Pix[i+2], d.RGBA.Pix[i+3] = rgba.R, rgba.G, rgba.B, rgba.A
+	} else {
+		d.RGBA.Set(x, y, c)
+	}
 	d.priority[y*Width+x] = d.high
 }
 func (g *Game) prepareActors() {
@@ -173,11 +181,14 @@ func (g *Game) drawActors(dst *image.RGBA, foreground ...bool) {
 	if len(foreground) == 0 || !foreground[0] {
 		g.prepareActors()
 	}
+	src := g.actorLayer
 	for y := 0; y < Height; y++ {
+		si, di := src.PixOffset(0, y), dst.PixOffset(0, y)
+		srow, drow := src.Pix[si:si+4*Width], dst.Pix[di:di+4*Width]
+		prio := g.actorPriority[y*Width : (y+1)*Width]
 		for x := 0; x < Width; x++ {
-			c := g.actorLayer.RGBAAt(x, y)
-			if c.A != 0 && (len(foreground) == 0 || g.actorPriority[y*Width+x] == foreground[0]) {
-				dst.SetRGBA(x, y, c)
+			if srow[x*4+3] != 0 && (len(foreground) == 0 || prio[x] == foreground[0]) {
+				copy(drow[x*4:x*4+4], srow[x*4:x*4+4])
 			}
 		}
 	}
